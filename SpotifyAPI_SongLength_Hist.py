@@ -1,3 +1,4 @@
+
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import matplotlib.pyplot as plt
@@ -12,16 +13,11 @@ results = sp.search(q=artist_name, type="artist")
 artist_id = results["artists"]["items"][0]["id"]
 
 # APIリクエストを送信して曲の一覧を取得
-results = sp.artist_albums(artist_id)
-albums = results["items"]
+results = sp.search(q=artist_name, type="track", limit=50)
+tracks = results["tracks"]["items"]
 
-# アーティストの曲一覧を取得
-albums = sp.artist_albums(artist_id, album_type="album")
-album_ids = [album["id"] for album in albums["items"]]
-tracks = []
-for album_id in album_ids:
-    album_tracks = sp.album_tracks(album_id)
-    tracks.extend(album_tracks["items"])
+# 取得した曲数の表示
+print("Number of tracks found: ", len(tracks))
 
 # 各曲の時間を取得して表示
 durations = []
@@ -29,7 +25,7 @@ for track in tracks:
     features = sp.audio_features(track["id"])
     duration = features[0]["duration_ms"] / 1000
     durations.append(duration)
-    print("Track: {0}, Duration: {1:.2f}s".format(track["name"], duration))
+    print("「{0}」, {1:.2f}s".format(track["name"], duration))
 
 # 取得した時間をヒストグラムに表示
 plt.hist(durations, bins=20)
